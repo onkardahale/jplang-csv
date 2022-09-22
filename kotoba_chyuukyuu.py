@@ -73,7 +73,7 @@ def writeCsv(ChptName, NChpt):
 
             # write the data
             writer.writerow(row)
-            print("Wrote "+ChptName+"...\n")
-
+            
+    print("Wrote "+ChptName+"...\n")
     file.close()
 

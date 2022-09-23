@@ -38,7 +38,6 @@ def findNWMax(NChpt):
 #writes csv for chapter
 def writeCsv(ChptName, NChpt):
 
-    soup = req_soup(URL+str(NChpt)+"/"+str(NChpt)+".html").find("ul", {"class", "new_word_list list-group"}).find_all("li")
     soup = req_soup(URL+str(NChpt)+"/"+str(NChpt)+".html").find("ul", {"class":"new_word_list list-group"}).find_all("li", {"class":"list-group-item"})
     NWMax = findNWMax(NChpt)
 

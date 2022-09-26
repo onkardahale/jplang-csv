@@ -27,61 +27,49 @@ def findChptMax():
     except:
         print("失敗")
 
-#finds number of words in a chapter
-def findNWMax(NChpt):
-    try:
-        soup = req_soup(URL+str(NChpt)+"/"+str(NChpt)+".html").find("ul", {"class":"new_word_list list-group"}).find_all("li")
-        return len(soup)
-    except:
-        print("失敗")
 
 #writes csv for chapter
 def writeCsv(ChptName, NChpt):
 
     soup = req_soup(URL+str(NChpt)+"/"+str(NChpt)+".html").find("ul", {"class", "new_word_list list-group"}).find_all("li")
-    NWMax = findNWMax(NChpt)
 
     file = open(ChptName, 'w', encoding='UTF8', newline='')
-
     writer = csv.writer(file)
 
-    for i in range(NWMax):
+    for li in soup:
+        row = []
+        front = ""
+        back = ""
+        hasKanji = True
 
-        for li in soup:
-            row = []
-            front = ""
-            back = ""
-            hasKanji = True
-
-            kanji = li.find("span", {"class": "word"})
-            if kanji is not None:
-                try:
-                    front = front + kanji.text.strip()
-                except:
-                    front =""
-                row.append(front)
-            else:
-                hasKanji = False
-
-            yomikata = li.find("span",{"class":"word-answer"})
-            if hasKanji == False:
-                front = front + yomikata.text.strip()
-                row.append(front)
-            else:
-                back = back + word.text.strip() + "\n"
-
-            imi = li.find("span",{"class":"textOverLine"})
+        kanji = li.find("span", {"class": "word"})
+        if kanji is not None:
             try:
-                back = back + imi.text.strip()+"\n"
+                front = front + kanji.text.strip()
             except:
-                back = back + ""
+                front =""
+            row.append(front)
+        else:
+            hasKanji = False
 
-            #append backside
-            row.append(back)
+        yomikata = li.find("span",{"class":"word-answer"})
+        if hasKanji == False:
+            front = front + yomikata.text.strip()
+            row.append(front)
+        else:
+            back = back + word.text.strip() + "\n"
 
-            # write the data
-            writer.writerow(row)
-            
+        imi = li.find("span",{"class":"textOverLine"})
+        try:
+            back = back + imi.text.strip()+"\n"
+        except:
+            back = back + ""
+
+        #append backside
+        row.append(back)
+
+        # write the data
+        writer.writerow(row)
+
     print("Wrote "+ChptName+"...\n")
     file.close()
-

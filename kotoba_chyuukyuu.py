@@ -26,53 +26,45 @@ def findChptMax():
         return len(soup)
     except:
         print("失敗")
-
-#finds number of words in a chapter
-def findNWMax(NChpt):
-    try:
-        soup = req_soup(URL+str(NChpt)+"/"+str(NChpt)+".html").find("ul", {"class":"new_word_list list-group"}).find_all("li")
-        return len(soup)
-    except:
-        print("失敗")
+        
 
 #writes csv for chapter
 def writeCsv(ChptName, NChpt):
 
     soup = req_soup(URL+str(NChpt)+"/"+str(NChpt)+".html").find("ul", {"class":"new_word_list list-group"}).find_all("li", {"class":"list-group-item"})
-    NWMax = findNWMax(NChpt)
 
     file = open(ChptName, 'w', encoding='UTF8', newline='')
-
     writer = csv.writer(file)
 
-    for i in range(NWMax):
+    for li in soup:
+        count +=1
+        row = []
+        front = ""
+        back = ""
 
-        for li in soup:
-            row = []
-            front = ""
-            back = ""
+        wordSoup = li.find("span", {"class":"word"})
+        front = wordSoup.text.strip()
+        row.append(front)
+        
+        yomikata = ""
+        imiTranslation = ""
+        span = li.find_all("button", {"class":"btn btn-xs btn-word"})
+        for s in span:
+            if s.text.strip() == "読み方":
+                yomikata = s.findNext("span").text.strip()
+                print(yomikata)
+            if s.text.strip() == "意味":
+                imiTranslation = s.findNext("span").text.strip().replace("英訳","")
+                print(imiTranslation+"\n-------")
 
-            wordSoup = li.find("span", {"class":"word"})
-            front = wordSoup.text.strip()
-            row.append(front)
+        back = yomikata+"\n"+imiTranslation
 
-            yomikata = ""
-            imiTranslation = ""
-            span = li.find_all("button", {"class":"btn btn-xs btn-word"})
-            for s in span:
-                if s.text.strip() == "読み方":
-                    yomikata = s.findNext("span").text.strip()
-                if s.text.strip() == "意味":
-                    imiTranslation = s.findNext("span").text.strip().replace("英訳","")
+        #append backside
+        row.append(back)
 
-            back = yomikata+"\n"+imiTranslation
-
-            #append backside
-            row.append(back)
-
-            # write the data
-            writer.writerow(row)
-            
+        # write the data
+        writer.writerow(row)
+    
     print("Wrote "+ChptName+"...\n")
     file.close()
 
